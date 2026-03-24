@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>交替传译与人机协同 | 互动式教材</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: #f6f9fc;
+            color: #1a2c3e;
+            line-height: 1.5;
+            scroll-behavior: smooth;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        /* 标题区 */
+        .chapter-header {
+            background: linear-gradient(135deg, #0b2b3b 0%, #1a4a5f 100%);
+            color: white;
+            border-radius: 2rem;
+            padding: 2rem 2rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 12px 24px -12px rgba(0,0,0,0.2);
+        }
+        .chapter-header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            margin-bottom: 0.5rem;
+        }
+        .chapter-header .sub {
+            font-size: 1rem;
+            opacity: 0.85;
+            margin-top: 0.5rem;
+            border-left: 3px solid #7bc5ae;
+            padding-left: 1rem;
+        }
+        .learning-targets {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(4px);
+            border-radius: 1.5rem;
+            padding: 1.2rem 1.5rem;
+            margin-top: 1.2rem;
+        }
+        .learning-targets h3 {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .learning-targets ul {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            list-style: none;
+        }
+        .learning-targets li {
+            background: rgba(255,255,255,0.2);
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        /* 通用卡片 */
+        .card {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03), 0 1px 2px rgba(0,0,0,0.05);
+            transition: box-shadow 0.2s;
+            border: 1px solid #e9edf2;
+        }
+        .card:hover {
+            box-shadow: 0 12px 24px -12px rgba(0,0,0,0.1);
+        }
+        .section-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            border-left: 5px solid #2c7a6e;
+            padding-left: 1rem;
+            color: #1a4a5f;
+        }
+        .subsection-title {
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin: 1rem 0 0.5rem 0;
+            color: #2c5a6e;
+        }
+        .badge {
+            background: #eef2f5;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+        /* 交互按钮/高亮 */
+        .interactive-click {
+            cursor: pointer;
+            color: #1f7b6e;
+            font-weight: 600;
+            border-bottom: 2px dashed #7bc5ae;
+            transition: 0.1s;
+        }
+        .interactive-click:hover {
+            color: #0f4f45;
+            background: #e6f4f0;
+            border-radius: 6px;
+        }
+        /* 流程图样式 */
+        .flowchart {
+            background: #f9fafc;
+            border-radius: 2rem;
+            padding: 1.2rem;
+            margin: 1rem 0;
+            text-align: center;
+        }
+        .flow-steps {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+        .step-node {
+            background: white;
+            border: 1px solid #cbdae6;
+            padding: 0.6rem 1.2rem;
+            border-radius: 60px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .step-node:hover {
+            background: #e0f0ec;
+            border-color: #2c7a6e;
+            transform: translateY(-2px);
+        }
+        .step-detail {
+            background: #eef3f7;
+            padding: 0.8rem;
+            border-radius: 1rem;
+            margin-top: 0.8rem;
+            font-size: 0.9rem;
+            color: #1a4e5f;
+            text-align: left;
+        }
+        .grid-2col {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.2rem;
+            margin: 1rem 0;
+        }
+        .principle-card {
+            background: #fefce8;
+            border-left: 6px solid #e6b422;
+            padding: 0.8rem 1rem;
+            border-radius: 1rem;
+            transition: 0.1s;
+        }
+        .principle-item {
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+        .principle-desc {
+            font-size: 0.9rem;
+            color: #3e5a6b;
+            margin-top: 0.25rem;
+            display: none;
+        }
+        .principle-desc.show {
+            display: block;
+        }
+        button.toggle-principle {
+            background: none;
+            border: none;
+            color: #2c7a6e;
+            font-size: 0.75rem;
+            cursor: pointer;
+            margin-top: 0.3rem;
+            font-weight: 500;
+        }
+        .tech-compare {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .tech-card {
+            flex: 1;
+            background: #f3f7fb;
+            border-radius: 1.2rem;
+            padding: 1rem;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            max-width: 450px;
+            width: 90%;
+            border-radius: 2rem;
+            padding: 1.6rem;
+            box-shadow: 0 20px 30px rgba(0,0,0,0.2);
+        }
+        .close-modal {
+            float: right;
+            font-size: 1.4rem;
+            cursor: pointer;
+        }
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            font-size: 0.8rem;
+            color: #5b7a8c;
+            border-top: 1px solid #dce5ec;
+            padding-top: 2rem;
+        }
+        @media (max-width: 700px) {
+            .container { padding: 1rem; }
+            .chapter-header h1 { font-size: 1.6rem; }
+        }
+        .ai-summary {
+            background: #e6f2ef;
+            border-radius: 1rem;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .btn-ai {
+            background: #2c7a6e;
+            border: none;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-ai:hover {
+            background: #1f5f55;
+        }
+        textarea {
+            width: 100%;
+            border-radius: 1rem;
+            border: 1px solid #cbdae6;
+            padding: 0.6rem;
+            font-family: inherit;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- 头部 -->
+    <div class="chapter-header">
+        <h1>第1章 交替传译与人机协同概述</h1>
+        <div class="sub">在跨语言交际活动中，口译是一种即时的信息转换过程。译员需要在极短时间内完成理解、分析与表达。<br>本章将帮助你建立对交替传译的系统认识，并理解其在整个口译体系中的定位，同时初步了解数字技术在交替传译中的作用。</div>
+        <div class="learning-targets">
+            <h3>🎯 学习目标</h3>
+            <ul>
+                <li>理解交替传译的定义及与其他口译形式的区别</li>
+                <li>描述交替传译的工作流程与认知过程</li>
+                <li>识别交替传译的核心特点与基本原则</li>
+                <li>了解交替传译的基本评估标准</li>
+                <li>区分技术在信息记录与信息处理中的不同作用</li>
+                <li>掌握本教材的学习模式与平台使用方式</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 单元1 认识交替传译 -->
+    <div class="card">
+        <div class="section-title">📖 单元1 · 认识交替传译</div>
+        <p><strong>交替传译（consecutive interpreting）</strong>是指在双语交际场景中，演讲者分段发言，译员在其停顿后使用另一种语言对内容进行传达的口译形式。</p>
+        <div class="subsection-title">📌 口译的多维度分类</div>
+        <div class="grid-2col">
+            <div>🔊 <strong>按实现手段</strong><br>口译（声音媒介） / 手语翻译（手势系统）</div>
+            <div>🔄 <strong>按工作模式</strong><br>交替传译（交替发言） / 同声传译（同步进行）<br><span class="badge">联络口译通常属于交替传译</span> <span class="badge">耳语传译属于同声传译</span></div>
+            <div>🏛️ <strong>按工作场景</strong><br>会议口译（正式场合） / 社区口译（医疗、法律等）</div>
+            <div>💻 <strong>按媒介</strong><br>线下口译 / 远程口译</div>
+        </div>
+        <p><strong>🎯 本教材关注的核心对象：</strong>数字技术环境下的会议交替传译</p>
+        <div class="subsection-title">🔍 多模态注释 · 点击查看“同声传译”详解</div>
+        <p><span class="interactive-click" id="showSimulModal">✨ 同声传译</span> —— 点击展开对比信息</p>
+    </div>
+
+    <!-- 单元2 工作过程 + 流程图 -->
+    <div class="card">
+        <div class="section-title">⚙️ 单元2 · 交替传译的工作过程</div>
+        <p>从操作层面看，交替传译表现为演讲者与译员的交替发言；从认知层面看，则体现为译员持续进行的信息加工过程。</p>
+        <div class="grid-2col">
+            <div><strong>📥 信息接收阶段（源语）</strong><br>聆听或阅读 · 理解 · 分析 · 记忆（笔记或信息记录技术）<br><span class="badge">这些过程并行发生</span></div>
+            <div><strong>📤 信息传达阶段（目的语）</strong><br>信息回忆 · 信息提取 · 组织表达</div>
+        </div>
+        <p>整体过程概括：<strong>信息接收（理解与分析） → 信息传达（表达与输出）</strong><br>“信息转换”贯穿理解与表达之间的动态过程，技术可作用于不同环节。</p>
+        
+        <!-- 互动流程图 -->
+        <div class="flowchart">
+            <div style="font-weight: 700; margin-bottom: 0.5rem;">🔄 认知加工流程图 (点击【分析】或【表达】查看详情)</div>
+            <div class="flow-steps" id="flowSteps">
+                <div class="step-node" data-step="input">📄 输入</div>
+                <div class="step-node" data-step="understand">🧠 理解</div>
+                <div class="step-node" data-step="analyze">🔍 分析</div>
+                <div class="step-node" data-step="memory">💾 记忆</div>
+                <div class="step-node" data-step="express">🎙️ 表达</div>
+            </div>
+            <div id="stepDetailBox" class="step-detail">
+                💡 点击任意节点获取说明 | 点击“分析”或“表达”有详细展开
+            </div>
+        </div>
+        <p class="badge">技术视角：信息记录类技术（笔记、语音转写）支持记忆环节；信息处理类技术（要点提取、结构分析）参与理解/分析/表达环节。</p>
+    </div>
+
+    <!-- 单元3 数字技术环境下的交替传译 + 概念区分 -->
+    <div class="card">
+        <div class="section-title">🤖 单元3 · 数字技术环境下的交替传译</div>
+        <p>语音识别(ASR)、机器翻译、大语言模型的发展显著改变工作环境。典型技术支持：实时语音识别、数字笔记工具、智能辅助分析工具等。<br>技术支持下，部分信息可记录留存，记忆负担分担，交传呈现“理解基础上的视译”特征。</p>
+        <div class="tech-compare">
+            <div class="tech-card"><strong>📁 信息记录类技术</strong><br>用于获取、保存与调用信息。<br>▪️ 语音识别（语音→文本）<br>▪️ 数字笔记（记录与回看）<br>▪️ 录音回放<br><span class="badge">特点：不改变信息结构，只提供信息支持</span></div>
+            <div class="tech-card"><strong>⚙️ 信息处理类技术</strong><br>用于分析、整理或重组信息。<br>▪️ 要点提取<br>▪️ 结构分析<br>▪️ 表达生成与改写<br><span class="badge">特点：参与信息加工过程，影响信息呈现方式</span></div>
+        </div>
+        <div class="ai-summary">
+            ⚠️ <strong>关键认知提醒</strong><br>技术并不能替代译员的核心能力：语音识别存在误差与延迟，自动分析可能偏离语境，自动生成可能不准确。译员仍然是信息理解与表达的最终决策者。
+        </div>
+    </div>
+
+    <!-- 单元4 特点与原则（可展开卡片） -->
+    <div class="card">
+        <div class="section-title">✨ 单元4 · 交替传译的特点与原则</div>
+        <div class="grid-2col">
+            <div class="principle-card"><strong>⚡ 即时性</strong><br>信息转瞬即逝，译员需极短时间内完成加工与输出。</div>
+            <div class="principle-card"><strong>💬 交际性</strong><br>核心目标是实现交际效果，而非语言形式对等。</div>
+            <div class="principle-card"><strong>🎤 口语性</strong><br>表达需自然、清晰，符合口头语体特征。</div>
+        </div>
+        <div class="subsection-title">📜 基本原则（点击展开详细说明）</div>
+        <div id="principlesContainer">
+            <div class="principle-item">🔹 交际原则</div>
+            <div class="principle-desc" id="desc-0">以实现有效沟通为核心，关注信息传递的实际效果。</div>
+            <button class="toggle-principle" data-index="0">📖 展开/收起</button>
+
+            <div class="principle-item">🔸 隐形原则</div>
+            <div class="principle-desc" id="desc-1">不介入个人观点，保持中立，忠实传达讲话人意图。</div>
+            <button class="toggle-principle" data-index="1">📖 展开/收起</button>
+
+            <div class="principle-item">🔹 意义导向原则</div>
+            <div class="principle-desc" id="desc-2">以意义为翻译单位，而非字面对应，关注深层信息。</div>
+            <button class="toggle-principle" data-index="2">📖 展开/收起</button>
+
+            <div class="principle-item">🔸 紧凑原则</div>
+            <div class="principle-desc" id="desc-3">表达简洁高效，避免冗余，符合交传场景节奏。</div>
+            <button class="toggle-principle" data-index="3">📖 展开/收起</button>
+        </div>
+        <p class="badge" style="margin-top: 0.8rem;">这些原则同样适用于技术环境，译员仍需对交际效果负责。</p>
+    </div>
+
+    <!-- 单元5 评估标准 -->
+    <div class="card">
+        <div class="section-title">📊 单元5 · 评估标准与自我认知</div>
+        <div class="grid-2col">
+            <div>✅ <strong>忠实性</strong><br>是否准确传达源语意义</div>
+            <div>📌 <strong>完整性</strong><br>是否覆盖关键信息</div>
+            <div>🎯 <strong>表达到位性</strong><br>表达是否得体、符合语境</div>
+            <div>🌊 <strong>流畅性</strong><br>语言是否自然、连贯</div>
+        </div>
+        <p>在数字环境中，可借助过程数据分析：停顿情况、修正频率、信息遗漏等，辅助提升质量认知。</p>
+    </div>
+
+    <!-- 单元6 如何使用本教材 + 学习行为 -->
+    <div class="card">
+        <div class="section-title">📚 单元6 · 如何使用本教材</div>
+        <p>本教材采用 <strong>“内容学习 + 任务训练 + 数据反馈”</strong> 模式：阅读与理解 → 完成任务 → 提交作业 → 获取反馈。</p>
+        <div class="ai-summary">
+            <strong>📌 学习行为要求（平台内）</strong><br>
+            ▪ 上传口译录音或视频 &nbsp;&nbsp; ▪ 提交笔记（图片或文本）<br>
+            ▪ 参与讨论与互评 &nbsp;&nbsp; ▪ 查看系统或教师反馈<br>
+            通过持续训练与数据积累，逐步形成对自身口译能力的系统认识。
+        </div>
+    </div>
+
+    <!-- 课后任务 互动区 -->
+    <div class="card">
+        <div class="section-title">📝 课后任务 & 互动思考</div>
+        <ol style="margin-left: 1.5rem; margin-bottom: 1rem;">
+            <li>用一句话概括交替传译的信息处理流程</li>
+            <li>比较传统交传与技术辅助交传的差异</li>
+            <li>使用AI助教总结本章核心概念</li>
+            <li>思考：技术是否改变了译员的角色？为什么？</li>
+        </ol>
+        <div style="background: #f1f5f9; border-radius: 1rem; padding: 1rem; margin: 1rem 0;">
+            <label><strong>✍️ 任务1 · 我的概括：</strong></label>
+            <textarea rows="2" placeholder="例如：交替传译是从信息接收（理解分析记忆）到信息传达（回忆组织表达）的动态转换过程……" id="task1Answer"></textarea>
+            <label style="margin-top: 0.5rem; display: block;"><strong>🤔 任务4 · 技术是否改变了译员的角色？</strong></label>
+            <textarea rows="3" placeholder="写下你的思考..." id="task4Answer"></textarea>
+        </div>
+        <div class="ai-summary" id="aiSummaryBlock">
+            <strong>🤖 AI助教（任务3）</strong><br>
+            <span id="aiSummaryText">点击下方按钮，生成本章核心概念总结。</span><br>
+            <button id="generateAISummary" class="btn-ai" style="margin-top: 0.5rem;">📌 生成核心概念总结</button>
+        </div>
+        <p class="badge">💡 任务2 可参考单元3技术区分：传统交传依靠脑记+纸笔，技术辅助交传引入语音识别、数字笔记与智能分析，分担记忆并辅助表达。</p>
+    </div>
+    <footer>© 互动式教材 · 交替传译与人机协同 | 点击交互模块深入学习</footer>
+</div>
+
+<!-- 同声传译模态框 -->
+<div id="simulModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" id="closeModalBtn">&times;</span>
+        <h3>🎧 同声传译 (Simultaneous Interpreting)</h3>
+        <p><strong>定义：</strong>译员与讲话几乎同步进行表达，延迟仅数秒。</p>
+        <p><strong>核心特征：</strong>时间重叠、负荷高、依赖专业设备。</p>
+        <p><strong>对比要点：</strong><br>
+        ▪ 交传：分段处理、负荷集中<br>
+        ▪ 同传：连续处理、负荷分散</p>
+        <p>同传通常在隔音同传箱中进行，而交传更注重笔记与短时记忆的协同。</p>
+    </div>
+</div>
+
+<script>
+    // 流程图交互逻辑：点击分析/表达展示特定细节，其他节点通用说明
+    const stepDetailBox = document.getElementById('stepDetailBox');
+    const stepNodes = document.querySelectorAll('.step-node');
+    
+    function updateStepDetail(step) {
+        if(step === 'analyze') {
+            stepDetailBox.innerHTML = '🔍 <strong>分析环节展开：</strong> 信息结构识别 / 逻辑关系判断 / 主旨提取。这是认知负荷密集区，技术可辅助语义分析。';
+        } else if(step === 'express') {
+            stepDetailBox.innerHTML = '🎙️ <strong>表达环节展开：</strong> 语言组织 / 信息重构 / 语体适配。在此阶段，智能生成工具可提供句式参考，但需译员最终审定。';
+        } else if(step === 'input') {
+            stepDetailBox.innerHTML = '📄 <strong>输入阶段：</strong> 源语信息进入工作记忆，包含听觉或视觉输入。技术可提供语音转写作为辅助。';
+        } else if(step === 'understand') {
+            stepDetailBox.innerHTML = '🧠 <strong>理解阶段：</strong> 解码源语语义、文化内涵及语境。大语言模型可辅助快速理解术语，但依赖译员判断准确性。';
+        } else if(step === 'memory') {
+            stepDetailBox.innerHTML = '💾 <strong>记忆阶段：</strong> 短期记忆与笔记协同。数字笔记工具、录音回放属于信息记录类技术，扩展记忆容量。';
+        } else {
+            stepDetailBox.innerHTML = '💡 点击任意节点获取详细说明 | 特别关注“分析”与“表达”环节的深层交互。';
+        }
+    }
+    
+    stepNodes.forEach(node => {
+        node.addEventListener('click', (e) => {
+            const step = node.getAttribute('data-step');
+            updateStepDetail(step);
+        });
+    });
+    
+    // 原则卡片展开收起
+    const toggleButtons = document.querySelectorAll('.toggle-principle');
+    toggleButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const idx = btn.getAttribute('data-index');
+            const descDiv = document.getElementById(`desc-${idx}`);
+            if(descDiv.classList.contains('show')) {
+                descDiv.classList.remove('show');
+                btn.innerHTML = '📖 展开';
+            } else {
+                descDiv.classList.add('show');
+                btn.innerHTML = '📕 收起';
+            }
+        });
+    });
+    
+    // 模态框 同声传译
+    const modal = document.getElementById('simulModal');
+    const showSimul = document.getElementById('showSimulModal');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    showSimul.addEventListener('click', () => {
+        modal.style.display = 'flex';
+    });
+    function closeModal() {
+        modal.style.display = 'none';
+    }
+    closeModalBtn.addEventListener('click', closeModal);
+    window.addEventListener('click', (e) => {
+        if(e.target === modal) closeModal();
+    });
+    
+    // AI助教总结生成（模拟智能总结）
+    const generateBtn = document.getElementById('generateAISummary');
+    const summarySpan = document.getElementById('aiSummaryText');
+    generateBtn.addEventListener('click', () => {
+        summarySpan.innerHTML = '✨ <strong>本章核心概念总结：</strong><br>交替传译是分段发言、交替传译的口译模式，核心流程包含接收(听析记)与传达(回忆重组)。交传具有即时性、交际性、口语性特点，遵循交际/隐形/意义导向/紧凑原则。在数字环境下，技术分为信息记录类(语音识别、数字笔记)与信息处理类(要点提取、结构分析)，辅助记忆与表达但无法取代译员决策。评估维度包括忠实性、完整性、表达到位性及流畅性。本教材倡导任务训练与数据反馈相结合。';
+        generateBtn.textContent = '✅ 已生成总结';
+        generateBtn.disabled = true;
+        generateBtn.style.opacity = '0.7';
+    });
+    
+    // 为任务1和任务4增加本地存储互动提示 (体验性)
+    const task1Area = document.getElementById('task1Answer');
+    const task4Area = document.getElementById('task4Answer');
+    if(localStorage.getItem('task1_consecutive')) task1Area.value = localStorage.getItem('task1_consecutive');
+    if(localStorage.getItem('task4_role')) task4Area.value = localStorage.getItem('task4_role');
+    task1Area.addEventListener('blur', () => {
+        localStorage.setItem('task1_consecutive', task1Area.value);
+    });
+    task4Area.addEventListener('blur', () => {
+        localStorage.setItem('task4_role', task4Area.value);
+    });
+    
+    // 额外增加一点初始提示（可选）
+    console.log("互动教材已加载 — 点击流程图节点，展开交传原则，探索技术区分");
+</script>
+</body>
+</html>
